@@ -2,15 +2,56 @@
   "name": "iban",
   "version": "0.0.14",
   "description": "A javascript library to validate, format and convert IBAN (International Bank Account Number) and BBAN (Basic Bank Account Number)",
-  "main": "iban.js",
-  "devDependencies": {
-    "mocha": "~1.14.0",
-    "chai": "~1.8.1"
+  "license": "MIT",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "engines": {
+    "node": ">=10"
   },
   "scripts": {
-    "test": "mocha"
+    "start": "tsdx watch",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "lint": "tsdx lint",
+    "prepare": "tsdx build",
+    "size": "size-limit",
+    "analyze": "size-limit --why"
   },
-  "repository": "https://github.com/arhs/iban.js",
+  "peerDependencies": {},
+  "husky": {
+    "hooks": {
+      "pre-commit": "tsdx lint"
+    }
+  },
+  "prettier": {
+    "printWidth": 120,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
   "author": "Laurent VB",
-  "license": "MIT"
+  "repository": "https://github.com/arhs/iban.js",
+  "module": "dist/iban.esm.js",
+  "size-limit": [
+    {
+      "path": "dist/iban.cjs.production.min.js",
+      "limit": "10 KB"
+    },
+    {
+      "path": "dist/iban.esm.js",
+      "limit": "10 KB"
+    }
+  ],
+  "devDependencies": {
+    "@size-limit/preset-small-lib": "^4.9.2",
+    "husky": "^5.0.9",
+    "size-limit": "^4.9.2",
+    "tsdx": "^0.14.1",
+    "tslib": "^2.1.0",
+    "typescript": "^4.1.5"
+  }
 }
