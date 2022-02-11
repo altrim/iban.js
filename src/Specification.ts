@@ -47,10 +47,7 @@ export class Specification {
    * @returns {string} the BBAN
    */
   toBBAN(iban: string, separator: string): string | undefined {
-    return this._regex()
-      ?.exec(iban.slice(4))
-      ?.slice(1)
-      .join(separator);
+    return this._regex()?.exec(iban.slice(4))?.slice(1).join(separator);
   }
 
   /**
@@ -104,7 +101,7 @@ export class Specification {
 
     return iban
       .split('')
-      .map(function(n) {
+      .map(function (n) {
         const code = n.charCodeAt(0);
         if (code >= A && code <= Z) {
           // A = 10, B = 11, ... Z = 35
@@ -127,7 +124,7 @@ export class Specification {
    */
   private parseStructure(structure: string): RegExp {
     // split in blocks of 3 chars
-    const regex = structure.match(/(.{3})/g)?.map(function(block) {
+    const regex = structure.match(/(.{3})/g)?.map(function (block) {
       // parse each structure block (1-char + 2-digits)
       let format;
       const pattern = block.slice(0, 1);
