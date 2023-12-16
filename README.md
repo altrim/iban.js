@@ -1,54 +1,53 @@
-[![npm version](https://badge.fury.io/js/iban.svg)](https://badge.fury.io/js/iban)
-[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/arhs/iban.js/master/LICENSE)
+# iban-ts
 
+## Overview
 
-# iban.js
+`iban-ts` is a TypeScript library forked from [iban.js](https://github.com/arhs/iban.js), designed for validating, formatting, and converting International Bank Account Numbers (IBAN) and Basic Bank Account Numbers (BBAN). 
 
-IBAN and BBAN validation, formatting and conversion in Javascript.
-Check the demo on [demo page] to try it.
+## Installation
 
-[demo page]: https://arhs.github.io/iban.js/
+To install `iban-ts`, use npm or yarn:
 
-IBAN.js follows the [ISO 13616 IBAN Registry technical specification](https://www.swift.com/standards/data-standards/iban).
-
+```bash
+npm install iban-ts
+# or
+yarn add iban-ts
+```
 ## Usage
+### Importing the Library
+You can import the entire library or specific functions:
 
-IBAN.js is compatible with both commonjs and AMD module definition. It can be used as a [node.js module](#in-nodejs) and [in the browser](#in-the-browser). It also has a bower manifest, a [Typescript definition](#with-typescript) and a [Meteor wrapper](#with-meteor-framework).
-
-### In node.js
-
-```js
-var IBAN = require('iban');
-IBAN.isValid('hello world'); // false
-IBAN.isValid('BE68539007547034'); // true
+```ts
+import * as IBAN from 'iban-ts';
+// or
+import { isValid, toBBAN, fromBBAN } from 'iban-ts';
 ```
 
-### In the browser
+### Validating an IBAN
+To check if an IBAN is valid:
 
-Using a module loader (AMD or commonjs) or directly through the global ```IBAN``` object:
-
-```html
-<script src="iban.js"></script>
-<script>
-    // the API is now accessible from the window.IBAN global object
-    IBAN.isValid('hello world'); // false
-    IBAN.isValid('BE68539007547034'); // true
-</script>
+```ts
+const valid = IBAN.isValid('DE89370400440532013000');
+console.log(valid); // true or false
 ```
 
-### With TypeScript
-The library is also available from the typescript language. To do this, [download the definition](https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/iban) and add a reference to this:
-```typescript
-/// <reference path="iban.d.ts" />
-IBAN.isValid('hello world');
-IBAN.isValid('BE68539007547034');
-```
-### With Meteor framework
-A wrapper package for the Meteor framework is available [here](https://atmospherejs.com/theduke/iban).
+### Converting BBAN to IBAN
+To convert a BBAN to an IBAN:
 
+```ts
+const iban = IBAN.fromBBAN('DE', '370400440532013000');
+console.log(iban); // DE89370400440532013000
+```
+
+### Formatting an IBAN
+To format an IBAN for printing:
+
+```ts
+const formatted = IBAN.printFormat('DE89370400440532013000', ' ');
+console.log(formatted); // DE89 3704 0044 0532 0130 00
+```
 
 ## API
-
     * isValid(iban)
     * toBBAN(iban, separator)
     * fromBBAN(countryCode, bban)

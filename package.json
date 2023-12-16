@@ -1,17 +1,17 @@
 {
   "name": "iban-ts",
-  "version": "0.2.0",
-  "description": "A javascript library to validate, format and convert IBAN (International Bank Account Number) and BBAN (Basic Bank Account Number)",
+  "version": "0.3.0",
+  "description": "A TypeScript library for validating, formatting, and converting IBAN (International Bank Account Number) and BBAN (Basic Bank Account Number), offering comprehensive support for international banking data standards.",
   "license": "MIT",
-  "main": "./dist/index.js",
-  "module": "./dist/iban-ts.esm.js",
+  "main": "dist/index.js",
+  "module": "dist/mylib.esm.js",
+  "typings": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/iban-ts.esm.js",
       "require": "./dist/index.js"
     }
   },
-  "typings": "dist/index.d.ts",
   "files": [
     "dist",
     "src"
@@ -28,13 +28,22 @@
     "start": "dts watch",
     "test": "dts test"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "dts lint"
+    }
+  },
   "prettier": {
     "printWidth": 120,
     "semi": true,
     "singleQuote": true,
     "trailingComma": "es5"
   },
-  "author": "Laurent VB",
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "peerDependencies": {},
+  "author": "Altrim Beqiri",
   "repository": "https://github.com/altrim/iban.js",
   "size-limit": [
     {
@@ -47,11 +56,12 @@
     }
   ],
   "devDependencies": {
-    "@size-limit/preset-small-lib": "7.0.8",
-    "@tsconfig/recommended": "1.0.1",
-    "dts-cli": "1.2.0",
-    "size-limit": "7.0.8",
-    "tslib": "2.3.1",
-    "typescript": "4.5.5"
+    "@size-limit/preset-small-lib": "11.0.1",
+    "@tsconfig/recommended": "1.0.3",
+    "dts-cli": "2.0.3",
+    "husky": "8.0.3",
+    "size-limit": "11.0.1",
+    "tslib": "2.6.2",
+    "typescript": "5.3.3"
   }
 }

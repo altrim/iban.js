@@ -1,14 +1,24 @@
 import { Specification } from './Specification';
 
+const NON_ALPHANUM = /[^a-zA-Z0-9]/g;
+const EVERY_FOUR_CHARS = /(.{4})(?!$)/g;
+
 /**
+ * Removes non-alphanumeric characters from the string and converts it to uppercase.
  *
- * @param iban
- * @returns {string}
+ * @param iban The IBAN string to format.
+ * @returns The formatted IBAN string.
  */
 const electronicFormat = (iban: string): string => iban.replace(NON_ALPHANUM, '').toUpperCase();
 
+// Map of country codes to their respective IBAN specifications
 const countries: Record<string, Specification> = {};
 
+/**
+ * Adds a new IBAN specification for a country.
+ *
+ * @param IBAN The IBAN specification to add.
+ */
 const addSpecification = (IBAN: Specification) => {
   countries[IBAN.countryCode] = IBAN;
 };
@@ -133,22 +143,19 @@ addSpecification(new Specification('MF', 27, 'F05F05A11F02', 'MF5512345123451234
 addSpecification(new Specification('PM', 27, 'F05F05A11F02', 'PM071234512345123456789AB13'));
 addSpecification(new Specification('WF', 27, 'F05F05A11F02', 'WF621234512345123456789AB13'));
 
-const NON_ALPHANUM = /[^a-zA-Z0-9]/g;
-const EVERY_FOUR_CHARS = /(.{4})(?!$)/g;
-
 /**
- * Utility function to check if a variable is a String.
+ * Type guard for checking if a value is a string.
  *
- * @param value
- * @returns {boolean} true if the passed variable is a String, false otherwise.
+ * @param value The value to check.
+ * @returns True if the value is a string, false otherwise.
  */
-const isString = (value: any): boolean => typeof value == 'string' || value instanceof String;
+const isString = (value: any): value is string => typeof value === 'string' || value instanceof String;
 
 /**
- * Check if an IBAN is valid.
+ * Validates an IBAN number.
  *
- * @param {string} iban the IBAN to validate.
- * @returns {boolean} true if the passed IBAN is valid, false otherwise
+ * @param iban The IBAN to validate.
+ * @returns True if the IBAN is valid, false otherwise.
  */
 const isValid = (iban: string): boolean => {
   if (!isString(iban)) {
@@ -156,7 +163,6 @@ const isValid = (iban: string): boolean => {
   }
   iban = electronicFormat(iban);
   const countryStructure = countries[iban.slice(0, 2)];
-
   return !!countryStructure && countryStructure.isValid(iban);
 };
 
