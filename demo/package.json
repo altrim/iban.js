@@ -12,7 +12,7 @@
     "@vueuse/core": "^10.7.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.0.0",
-    "iban-ts": "*",
+    "iban-ts": "^0.3.3",
     "lucide-vue-next": "^0.298.0",
     "radix-vue": "^1.2.4",
     "tailwind-merge": "^2.1.0",
@@ -24,8 +24,8 @@
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.32",
     "tailwindcss": "^3.3.6",
-    "typescript": "^5.2.2",
-    "vite": "^5.0.8",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10",
     "vue-tsc": "^1.8.25"
   }
 }

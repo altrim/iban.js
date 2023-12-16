@@ -12,11 +12,17 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-// @ts-ignore
 import { isValid, isValidBBAN, fromBBAN, countries } from 'iban-ts';
 
 type CountryNames = {
   [key: string]: string;
+};
+type AppData = {
+  selectedCountry: string;
+  iban: string;
+  validationMessage: string;
+  isValid: boolean | null;
+  countryNames: CountryNames;
 };
 export default {
   components: {
@@ -290,7 +296,7 @@ export default {
         ZM: 'Zambia',
         ZW: 'Zimbabwe',
       } as CountryNames,
-    };
+    } as AppData;
   },
   methods: {
     resetIsValid() {
@@ -341,7 +347,9 @@ export default {
             <SelectContent>
               <SelectGroup className="overflow-y-auto max-h-[20rem]">
                 <SelectLabel>Select country</SelectLabel>
-                <SelectItem v-for="(name, code) in countryNames" :key="code" :value="code.toString()">{{ name }}</SelectItem>
+                <SelectItem v-for="(name, code) in countryNames" :key="code" :value="code.toString()">{{
+                  name
+                }}</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
