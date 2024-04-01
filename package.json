@@ -1,6 +1,6 @@
 {
   "name": "iban-ts",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "A TypeScript library for validating, formatting, and converting IBAN (International Bank Account Number) and BBAN (Basic Bank Account Number), offering comprehensive support for international banking data standards.",
   "license": "MIT",
   "main": "dist/index.js",
@@ -23,16 +23,11 @@
   "scripts": {
     "analyze": "size-limit --why",
     "build": "dts build",
-    "lint": "dts lint",
-    "prepare": "dts build",
+    "lint": "dts lint src",
+    "prepare": "husky",
     "size": "size-limit",
     "start": "dts watch",
     "test": "dts test"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "dts lint"
-    }
   },
   "prettier": {
     "printWidth": 120,
@@ -57,12 +52,12 @@
     }
   ],
   "devDependencies": {
-    "@size-limit/preset-small-lib": "11.0.1",
-    "@tsconfig/recommended": "1.0.3",
-    "dts-cli": "2.0.3",
-    "husky": "8.0.3",
-    "size-limit": "11.0.1",
+    "@size-limit/preset-small-lib": "11.1.2",
+    "@tsconfig/recommended": "1.0.5",
+    "dts-cli": "2.0.4",
+    "husky": "9.0.11",
+    "size-limit": "11.1.2",
     "tslib": "2.6.2",
-    "typescript": "5.3.3"
+    "typescript": "5.4.3"
   }
 }
