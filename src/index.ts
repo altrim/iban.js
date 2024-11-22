@@ -1,28 +1,38 @@
 import { Specification } from './Specification';
 
 const NON_ALPHANUM = /[^a-zA-Z0-9]/g;
-const EVERY_FOUR_CHARS = /(.{4})(?!$)/g;
 
 /**
  * Removes non-alphanumeric characters from the string and converts it to uppercase.
  *
- * @param iban The IBAN string to format.
+ * @param iban - The IBAN string to format.
  * @returns The formatted IBAN string.
  */
 const electronicFormat = (iban: string): string => iban.replace(NON_ALPHANUM, '').toUpperCase();
 
-// Map of country codes to their respective IBAN specifications
+/**
+ * Type guard for checking if a value is a string.
+ *
+ * @param value - The value to check.
+ * @returns True if the value is a string, false otherwise.
+ */
+const isString = (value: any): value is string => typeof value === 'string' || value instanceof String;
+
+/**
+ * Map of country codes to their respective IBAN specifications.
+ */
 const countries: Record<string, Specification> = {};
 
 /**
  * Adds a new IBAN specification for a country.
  *
- * @param IBAN The IBAN specification to add.
+ * @param IBAN - The IBAN specification to add.
  */
-const addSpecification = (IBAN: Specification) => {
+const addSpecification = (IBAN: Specification): void => {
   countries[IBAN.countryCode] = IBAN;
 };
 
+// Add all the country specifications
 addSpecification(new Specification('AD', 24, 'F04F04A12', 'AD1200012030200359100100'));
 addSpecification(new Specification('AE', 23, 'F03F16', 'AE070331234567890123456'));
 addSpecification(new Specification('AL', 28, 'F08A16', 'AL47212110090000000235698741'));
@@ -101,35 +111,22 @@ addSpecification(new Specification('VA', 22, 'F18', 'VA59001123000012345678'));
 addSpecification(new Specification('VG', 24, 'U04F16', 'VG96VPVG0000012345678901'));
 addSpecification(new Specification('XK', 20, 'F04F10F02', 'XK051212012345678906'));
 
-// The following countries are not included in the official IBAN registry but use the IBAN specification
-// Angola
+// Non-official IBAN countries
 addSpecification(new Specification('AO', 25, 'F21', 'AO69123456789012345678901'));
-// Burkina
 addSpecification(new Specification('BF', 27, 'F23', 'BF2312345678901234567890123'));
-// Burundi
 addSpecification(new Specification('BI', 16, 'F12', 'BI41123456789012'));
-// Benin
 addSpecification(new Specification('BJ', 28, 'F24', 'BJ39123456789012345678901234'));
-// Ivory
 addSpecification(new Specification('CI', 28, 'U02F22', 'CI70CI1234567890123456789012'));
-// Cameron
 addSpecification(new Specification('CM', 27, 'F23', 'CM9012345678901234567890123'));
-// Cape Verde
 addSpecification(new Specification('CV', 25, 'F21', 'CV30123456789012345678901'));
-// Algeria
 addSpecification(new Specification('DZ', 24, 'F20', 'DZ8612345678901234567890'));
-// Iran
 addSpecification(new Specification('IR', 26, 'F22', 'IR861234568790123456789012'));
-// Madagascar
 addSpecification(new Specification('MG', 27, 'F23', 'MG1812345678901234567890123'));
-// Mali
 addSpecification(new Specification('ML', 28, 'U01F23', 'ML15A12345678901234567890123'));
-// Mozambique
 addSpecification(new Specification('MZ', 25, 'F21', 'MZ25123456789012345678901'));
-// Senegal
 addSpecification(new Specification('SN', 28, 'U01F23', 'SN52A12345678901234567890123'));
 
-// The following are regional and administrative French Republic subdivision IBAN specification (same structure as FR, only country code vary)
+// French territories
 addSpecification(new Specification('GF', 27, 'F05F05A11F02', 'GF121234512345123456789AB13'));
 addSpecification(new Specification('GP', 27, 'F05F05A11F02', 'GP791234512345123456789AB13'));
 addSpecification(new Specification('MQ', 27, 'F05F05A11F02', 'MQ221234512345123456789AB13'));
@@ -144,17 +141,9 @@ addSpecification(new Specification('PM', 27, 'F05F05A11F02', 'PM0712345123451234
 addSpecification(new Specification('WF', 27, 'F05F05A11F02', 'WF621234512345123456789AB13'));
 
 /**
- * Type guard for checking if a value is a string.
- *
- * @param value The value to check.
- * @returns True if the value is a string, false otherwise.
- */
-const isString = (value: any): value is string => typeof value === 'string' || value instanceof String;
-
-/**
  * Validates an IBAN number.
  *
- * @param iban The IBAN to validate.
+ * @param iban - The IBAN to validate.
  * @returns True if the IBAN is valid, false otherwise.
  */
 const isValid = (iban: string): boolean => {
@@ -167,11 +156,12 @@ const isValid = (iban: string): boolean => {
 };
 
 /**
- * Convert an IBAN to a BBAN.
+ * Converts an IBAN to a BBAN.
  *
- * @param iban
- * @param {string} [separator] the separator to use between the blocks of the BBAN, defaults to ' '
- * @returns {string|*}
+ * @param iban - The IBAN to convert.
+ * @param separator - The separator to use between BBAN blocks, defaults to ' '.
+ * @returns The BBAN or undefined if conversion fails.
+ * @throws {Error} If the country code is invalid.
  */
 const toBBAN = (iban: string, separator: string = ' '): string | undefined => {
   iban = electronicFormat(iban);
@@ -184,13 +174,11 @@ const toBBAN = (iban: string, separator: string = ' '): string | undefined => {
 };
 
 /**
- * Convert the passed BBAN to an IBAN for this country specification.
- * Please note that <i>"generation of the IBAN shall be the exclusive responsibility of the bank/branch servicing the account"</i>.
- * This method implements the preferred algorithm described in http://en.wikipedia.org/wiki/International_Bank_Account_Number#Generating_IBAN_check_digits
- *
- * @param countryCode the country of the BBAN
- * @param bban the BBAN to convert to IBAN
- * @returns {string} the IBAN
+ * Converts the passed BBAN to an IBAN for this country specification.
+ * @param countryCode - The country code of the BBAN.
+ * @param bban - The BBAN to convert to IBAN.
+ * @returns The corresponding IBAN.
+ * @throws {Error} If the BBAN is invalid or the country code is invalid.
  */
 const fromBBAN = (countryCode: string, bban: string): string => {
   const countryStructure = countries[countryCode];
@@ -202,27 +190,32 @@ const fromBBAN = (countryCode: string, bban: string): string => {
 };
 
 /**
- * Check the validity of the passed BBAN.
+ * Checks the validity of the passed BBAN.
  *
- * @param countryCode the country of the BBAN
- * @param bban the BBAN to check the validity of
+ * @param countryCode - The country code of the BBAN.
+ * @param bban - The BBAN to check the validity of.
+ * @returns True if the BBAN is valid, false otherwise.
  */
 const isValidBBAN = (countryCode: string, bban: string): boolean => {
   if (!isString(bban)) {
     return false;
   }
   const countryStructure = countries[countryCode];
-
-  return countryStructure?.isValidBBAN(electronicFormat(bban));
+  return !!countryStructure && countryStructure.isValidBBAN(electronicFormat(bban));
 };
 
 /**
+ * Formats the IBAN in print format by inserting separators between groups of characters.
  *
- * @param iban
- * @param separator
- * @returns {string}
+ * @param iban - The IBAN to format.
+ * @param separator - The separator to use between groups, defaults to ' '.
+ * @param groupSize - The size of each group of characters, defaults to 4.
+ * @returns The formatted IBAN string.
  */
-const printFormat = (iban: string, separator: string = ' '): string =>
-  electronicFormat(iban).replace(EVERY_FOUR_CHARS, '$1' + separator);
+const printFormat = (iban: string, separator: string = ' ', groupSize: number = 4): string => {
+  const regex = new RegExp(`(.{${groupSize}})(?!$)`, 'g');
+
+  return electronicFormat(iban).replace(regex, `$1${separator}`);
+};
 
 export { countries, electronicFormat, fromBBAN, isValid, isValidBBAN, printFormat, toBBAN };

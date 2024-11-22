@@ -1,13 +1,16 @@
-const A = 'A'.charCodeAt(0);
-
+const formats = {
+  A: '0-9A-Za-z',
+  B: '0-9A-Z',
+  C: 'A-Za-z',
+  F: '0-9',
+  L: 'a-z',
+  U: 'A-Z',
+  W: '0-9a-z',
+} as const;
 /**
  * Represents a specification for validating and manipulating IBANs (International Bank Account Numbers).
  */
 export class Specification {
-  countryCode: string;
-  length: number;
-  structure: string;
-  example: string;
   private _cachedRegex: RegExp | null = null;
 
   /**
@@ -17,12 +20,12 @@ export class Specification {
    * @param structure - The structure of the underlying BBAN (Basic Bank Account Number).
    * @param example - An example of a valid IBAN for this specification.
    */
-  constructor(countryCode: string, length: number, structure: string, example: string) {
-    this.countryCode = countryCode;
-    this.length = length;
-    this.structure = structure;
-    this.example = example;
-  }
+  constructor(
+    public readonly countryCode: string,
+    public readonly length: number,
+    public readonly structure: string,
+    public readonly example: string
+  ) {}
 
   /**
    * Checks if the given IBAN is valid according to this specification.
@@ -45,7 +48,8 @@ export class Specification {
    * @returns The BBAN or undefined if the conversion fails.
    */
   toBBAN(iban: string, separator: string = ' '): string | undefined {
-    return this._regex()?.exec(iban.slice(4))?.slice(1).join(separator);
+    const match = this._regex().exec(iban.slice(4));
+    return match ? match.slice(1).join(separator) : undefined;
   }
 
   /**
@@ -60,7 +64,7 @@ export class Specification {
     }
 
     const prepared = this.iso13616Prepare(this.countryCode + '00' + bban);
-    const checkDigit = ('0' + (98 - this.iso7064Mod97_10(prepared))).slice(-2);
+    const checkDigit = String(98 - this.iso7064Mod97_10(prepared)).padStart(2, '0');
 
     return this.countryCode + checkDigit + bban;
   }
@@ -86,58 +90,56 @@ export class Specification {
   }
 
   /**
-   * Prepares an IBAN for mod 97 computation as specified in ISO13616.
+   * Prepares an IBAN for MOD 97-10 computation as specified in ISO 13616.
    * @param iban - The IBAN to prepare.
-   * @returns The prepared IBAN.
+   * @returns The prepared numeric IBAN string.
    */
   private iso13616Prepare(iban: string): string {
-    iban = iban.toUpperCase();
-    iban = iban.substr(4) + iban.substr(0, 4);
-
-    return iban.replace(/[A-Z]/g, (match) => (match.charCodeAt(0) - A + 10).toString());
+    const rearranged = (iban.slice(4) + iban.slice(0, 4)).toUpperCase();
+    return rearranged.replace(/[A-Z]/g, (char) => (char.charCodeAt(0) - 55).toString());
   }
+
   /**
    * Parses the BBAN structure and returns a matching regular expression.
    * @param structure - The structure to parse.
    * @returns A RegExp derived from the BBAN structure.
+   * @throws {Error} If the structure format is invalid.
    */
   private parseStructure(structure: string): RegExp {
-    const formats: { [key: string]: string } = {
-      A: '0-9A-Za-z',
-      B: '0-9A-Z',
-      C: 'A-Za-z',
-      F: '0-9',
-      L: 'a-z',
-      U: 'A-Z',
-      W: '0-9a-z',
-    };
+    const blocks = structure.match(/.{3}/g);
 
-    const regex = structure
-      .match(/.{3}/g)
-      ?.map((block) => {
-        const [pattern, repeats] = [block[0], parseInt(block.slice(1), 10)];
+    if (!blocks) {
+      throw new Error(`Invalid structure format: ${structure}`);
+    }
 
-        if (!formats[pattern]) {
-          throw new Error(`Invalid pattern: ${pattern}`);
-        }
+    const regexParts = blocks.map((block) => {
+      const pattern = block.charAt(0);
+      const repeats = parseInt(block.slice(1), 10);
 
-        return `([${formats[pattern]}]{${repeats}})`;
-      })
-      .join('');
+      const format = formats[pattern as keyof typeof formats];
 
-    return new RegExp(`^${regex}$`);
+      if (!format) {
+        throw new Error(`Invalid pattern: ${pattern}`);
+      }
+
+      return `([${format}]{${repeats}})`;
+    });
+
+    return new RegExp(`^${regexParts.join('')}$`);
   }
 
   /**
-   * Calculates the MOD 97 10 of the passed IBAN as specified in ISO7064.
-   * @param iban - The IBAN to calculate the MOD 97 10 for.
-   * @returns The MOD 97 10 result.
+   * Calculates the MOD 97-10 of the passed IBAN as specified in ISO 7064.
+   * @param iban - The IBAN to calculate the MOD 97-10 for.
+   * @returns The MOD 97-10 result.
    */
   private iso7064Mod97_10(iban: string): number {
     let remainder = iban;
+    let block: string;
+
     while (remainder.length > 2) {
-      const block = remainder.slice(0, 9);
-      remainder = (parseInt(block, 10) % 97) + remainder.slice(block.length);
+      block = remainder.slice(0, 9);
+      remainder = (parseInt(block, 10) % 97).toString() + remainder.slice(block.length);
     }
 
     return parseInt(remainder, 10) % 97;
