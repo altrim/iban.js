@@ -41,7 +41,10 @@
   },
   "peerDependencies": {},
   "author": "Altrim Beqiri",
-  "repository": "https://github.com/altrim/iban.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/altrim/iban.js.git"
+  },
   "size-limit": [
     {
       "path": "dist/iban-ts.cjs.production.min.js",
