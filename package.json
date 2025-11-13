@@ -44,21 +44,21 @@
   "repository": "https://github.com/altrim/iban.js",
   "size-limit": [
     {
-      "path": "dist/iban.cjs.production.min.js",
+      "path": "dist/iban-ts.cjs.production.min.js",
       "limit": "10 KB"
     },
     {
-      "path": "dist/iban.esm.js",
+      "path": "dist/iban-ts.esm.js",
       "limit": "10 KB"
     }
   ],
   "devDependencies": {
-    "@size-limit/preset-small-lib": "11.1.6",
-    "@tsconfig/recommended": "1.0.8",
+    "@size-limit/preset-small-lib": "11.2.0",
+    "@tsconfig/recommended": "1.0.13",
     "dts-cli": "2.0.5",
     "husky": "9.1.7",
-    "size-limit": "11.1.6",
+    "size-limit": "11.2.0",
     "tslib": "2.8.1",
-    "typescript": "5.6.3"
+    "typescript": "5.9.3"
   }
 }
