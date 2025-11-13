@@ -1,6 +1,6 @@
 {
   "name": "iban-ts",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "A TypeScript library for validating, formatting, and converting IBAN (International Bank Account Number) and BBAN (Basic Bank Account Number), offering comprehensive support for international banking data standards.",
   "license": "MIT",
   "main": "dist/index.js",
