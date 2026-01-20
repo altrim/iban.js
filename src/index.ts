@@ -3,20 +3,26 @@ import { Specification } from './Specification';
 const NON_ALPHANUM = /[^a-zA-Z0-9]/g;
 
 /**
- * Removes non-alphanumeric characters from the string and converts it to uppercase.
- *
- * @param iban - The IBAN string to format.
- * @returns The formatted IBAN string.
- */
-const electronicFormat = (iban: string): string => iban.replace(NON_ALPHANUM, '').toUpperCase();
-
-/**
  * Type guard for checking if a value is a string.
  *
  * @param value - The value to check.
  * @returns True if the value is a string, false otherwise.
  */
 const isString = (value: any): value is string => typeof value === 'string' || value instanceof String;
+
+/**
+ * Removes non-alphanumeric characters from the string and converts it to uppercase.
+ *
+ * @param iban - The IBAN string to format.
+ * @returns The formatted IBAN string.
+ * @throws {TypeError} If the input is not a string.
+ */
+const electronicFormat = (iban: string): string => {
+  if (!isString(iban)) {
+    throw new TypeError('Expected iban to be a string');
+  }
+  return iban.replace(NON_ALPHANUM, '').toUpperCase();
+};
 
 /**
  * Map of country codes to their respective IBAN specifications.
@@ -161,9 +167,13 @@ const isValid = (iban: string): boolean => {
  * @param iban - The IBAN to convert.
  * @param separator - The separator to use between BBAN blocks, defaults to ' '.
  * @returns The BBAN or undefined if conversion fails.
+ * @throws {TypeError} If iban is not a string.
  * @throws {Error} If the country code is invalid.
  */
 const toBBAN = (iban: string, separator: string = ' '): string | undefined => {
+  if (!isString(iban)) {
+    throw new TypeError('Expected iban to be a string');
+  }
   iban = electronicFormat(iban);
   const countryStructure = countries[iban.slice(0, 2)];
   if (!countryStructure) {
@@ -178,9 +188,16 @@ const toBBAN = (iban: string, separator: string = ' '): string | undefined => {
  * @param countryCode - The country code of the BBAN.
  * @param bban - The BBAN to convert to IBAN.
  * @returns The corresponding IBAN.
+ * @throws {TypeError} If countryCode or bban is not a string.
  * @throws {Error} If the BBAN is invalid or the country code is invalid.
  */
 const fromBBAN = (countryCode: string, bban: string): string => {
+  if (!isString(countryCode)) {
+    throw new TypeError('Expected countryCode to be a string');
+  }
+  if (!isString(bban)) {
+    throw new TypeError('Expected bban to be a string');
+  }
   const countryStructure = countries[countryCode];
   if (!countryStructure) {
     throw new Error('No country with code ' + countryCode);
@@ -197,7 +214,7 @@ const fromBBAN = (countryCode: string, bban: string): string => {
  * @returns True if the BBAN is valid, false otherwise.
  */
 const isValidBBAN = (countryCode: string, bban: string): boolean => {
-  if (!isString(bban)) {
+  if (!isString(countryCode) || !isString(bban)) {
     return false;
   }
   const countryStructure = countries[countryCode];
@@ -209,10 +226,18 @@ const isValidBBAN = (countryCode: string, bban: string): boolean => {
  *
  * @param iban - The IBAN to format.
  * @param separator - The separator to use between groups, defaults to ' '.
- * @param groupSize - The size of each group of characters, defaults to 4.
+ * @param groupSize - The size of each group of characters, defaults to 4. Must be greater than 0.
  * @returns The formatted IBAN string.
+ * @throws {TypeError} If iban is not a string.
+ * @throws {RangeError} If groupSize is less than 1.
  */
 const printFormat = (iban: string, separator: string = ' ', groupSize: number = 4): string => {
+  if (!isString(iban)) {
+    throw new TypeError('Expected iban to be a string');
+  }
+  if (groupSize < 1) {
+    throw new RangeError('Expected groupSize to be at least 1');
+  }
   const regex = new RegExp(`(.{${groupSize}})(?!$)`, 'g');
 
   return electronicFormat(iban).replace(regex, `$1${separator}`);
