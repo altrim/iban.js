@@ -1,67 +1,87 @@
 {
   "name": "iban-ts",
-  "version": "0.11.0",
-  "description": "A TypeScript library for validating, formatting, and converting IBAN (International Bank Account Number) and BBAN (Basic Bank Account Number), offering comprehensive support for international banking data standards.",
+  "version": "1.0.0",
+  "description": "Validate, format, and convert IBAN (International Bank Account Number) and BBAN (Basic Bank Account Number) for every country in the SWIFT IBAN Registry. Zero dependencies, TypeScript, ESM + CommonJS.",
   "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/iban-ts.esm.js",
-  "typings": "dist/index.d.ts",
+  "author": "Altrim Beqiri",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/altrim/iban.js.git"
+  },
+  "homepage": "https://github.com/altrim/iban.js#readme",
+  "bugs": {
+    "url": "https://github.com/altrim/iban.js/issues"
+  },
+  "keywords": [
+    "iban",
+    "bban",
+    "sepa",
+    "bank",
+    "bank-account",
+    "validation",
+    "validator",
+    "iso-13616",
+    "mod97",
+    "typescript"
+  ],
   "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.cts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/iban-ts.esm.js",
-      "require": "./dist/index.js"
-    }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
   },
+  "sideEffects": false,
   "files": [
     "dist",
     "src"
   ],
   "engines": {
-    "node": ">=14"
+    "node": ">=20"
   },
   "scripts": {
-    "analyze": "size-limit --why",
-    "build": "dts build",
-    "lint": "dts lint src",
+    "build": "tsdown",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm test && npm run build && npm run size",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "oxlint src test",
     "prepare": "husky",
+    "prepublishOnly": "npm run check",
     "size": "size-limit",
-    "start": "dts watch",
-    "test": "dts test"
-  },
-  "prettier": {
-    "printWidth": 120,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
-  "jest": {
-    "testEnvironment": "node"
-  },
-  "peerDependencies": {},
-  "author": "Altrim Beqiri",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/altrim/iban.js.git"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
   },
   "size-limit": [
     {
-      "path": "dist/iban-ts.cjs.production.min.js",
-      "limit": "10 KB"
+      "path": "dist/index.js",
+      "limit": "6 KB"
     },
     {
-      "path": "dist/iban-ts.esm.js",
-      "limit": "10 KB"
+      "path": "dist/index.cjs",
+      "limit": "6 KB"
     }
   ],
   "devDependencies": {
-    "@size-limit/preset-small-lib": "11.2.0",
-    "@tsconfig/recommended": "1.0.13",
-    "dts-cli": "2.0.5",
+    "@arethetypeswrong/cli": "0.18.5",
+    "@size-limit/preset-small-lib": "14.3.0",
     "husky": "9.1.7",
-    "size-limit": "11.2.0",
-    "tslib": "2.8.1",
-    "typescript": "5.9.3"
+    "oxlint": "1.90.0",
+    "prettier": "3.9.10",
+    "publint": "0.3.25",
+    "size-limit": "14.3.0",
+    "tsdown": "0.23.4",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
   }
 }

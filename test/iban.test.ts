@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { countries, electronicFormat, fromBBAN, isValid, isValidBBAN, printFormat, toBBAN } from '../src/index';
 
 describe('IBAN', function () {
@@ -39,13 +40,13 @@ describe('IBAN', function () {
 
     it('should return true for all examples', function () {
       Object.keys(countries).forEach(function (countryCode) {
-        expect(isValid(countries[countryCode].example)).toBe(true);
+        expect(isValid(countries[countryCode]!.example)).toBe(true);
       });
     });
 
     it('should return false for all examples when modifying just one digit', function () {
       Object.keys(countries).forEach(function (countryCode) {
-        var num = countries[countryCode].example;
+        let num = countries[countryCode]!.example;
         num = num.slice(0, -1) + ((parseInt(num.slice(-1), 10) + 1) % 10);
         expect(isValid(num)).toBe(false);
       });
@@ -206,7 +207,7 @@ describe('IBAN', function () {
 
     it('should have valid structure for each country', function () {
       Object.keys(countries).forEach((code) => {
-        const spec = countries[code];
+        const spec = countries[code]!;
         expect(spec.countryCode).toBe(code);
         expect(spec.length).toBeGreaterThan(0);
         expect(spec.structure).toBeTruthy();
