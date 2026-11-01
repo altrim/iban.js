@@ -1,5 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { countries, electronicFormat, fromBBAN, isValid, isValidBBAN, printFormat, toBBAN } from '../src/index';
+import {
+  countries,
+  electronicFormat,
+  fromBBAN,
+  isValid,
+  isValidBBAN,
+  printFormat,
+  Specification,
+  toBBAN,
+} from '../src/index';
 
 describe('IBAN', function () {
   describe('.isValid', function () {
@@ -213,6 +222,98 @@ describe('IBAN', function () {
         expect(spec.structure).toBeTruthy();
         expect(spec.example).toBeTruthy();
       });
+    });
+  });
+
+  describe('input normalization', function () {
+    it('should accept lowercase and print-formatted IBANs in isValid', function () {
+      expect(isValid('be68 5390 0754 7034')).toBe(true);
+    });
+
+    it('should return false for empty or truncated input', function () {
+      expect(isValid('')).toBe(false);
+      expect(isValid('BE')).toBe(false);
+      expect(isValid('BE68')).toBe(false);
+    });
+
+    it('should accept a lowercase or padded country code in fromBBAN and isValidBBAN', function () {
+      expect(fromBBAN('be', '539007547034')).toEqual('BE68539007547034');
+      expect(fromBBAN(' BE ', '539007547034')).toEqual('BE68539007547034');
+      expect(isValidBBAN('be', '539007547034')).toBe(true);
+    });
+
+    it('should not resolve Object.prototype keys as country codes', function () {
+      expect(() => fromBBAN('constructor', '539007547034')).toThrow(/No country with code/);
+      expect(() => toBBAN('__proto__')).toThrow(/No country with code/);
+      expect(isValidBBAN('constructor', '539007547034')).toBe(false);
+      expect(isValidBBAN('hasOwnProperty', '539007547034')).toBe(false);
+    });
+  });
+
+  describe('.printFormat edge cases', function () {
+    it('should throw RangeError when groupSize is not an integer', function () {
+      expect(() => printFormat('BE68539007547034', ' ', 1.5)).toThrow(RangeError);
+      expect(() => printFormat('BE68539007547034', ' ', NaN)).toThrow(RangeError);
+      expect(() => printFormat('BE68539007547034', ' ', Infinity)).toThrow(RangeError);
+    });
+
+    it('should return the whole IBAN when groupSize exceeds its length', function () {
+      expect(printFormat('BE68539007547034', ' ', 100)).toEqual('BE68539007547034');
+    });
+
+    it('should format an empty string as an empty string', function () {
+      expect(printFormat('')).toEqual('');
+    });
+  });
+
+  describe('.fromBBAN check digits', function () {
+    it('should compute two-digit check digits with leading zero', function () {
+      // DE example from the registry
+      expect(fromBBAN('DE', '370400440532013000')).toEqual('DE89370400440532013000');
+      // MN example has check digit "12"; find one producing < 10 via a known registry example
+      expect(fromBBAN('JE', 'ABCD12345612345678')).toEqual('JE06ABCD12345612345678');
+    });
+
+    it('should round-trip every example through toBBAN and fromBBAN', function () {
+      for (const code of Object.keys(countries)) {
+        const example = countries[code]!.example;
+        const bban = toBBAN(example, '');
+        expect(bban).toBeDefined();
+        expect(fromBBAN(code, bban!)).toEqual(example);
+      }
+    });
+  });
+
+  describe('Specification', function () {
+    it('should be exported and carry official/sepa metadata', function () {
+      const de = countries['DE']!;
+      expect(de).toBeInstanceOf(Specification);
+      expect(de.official).toBe(true);
+      expect(de.sepa).toBe(true);
+      expect(countries['AE']!.sepa).toBe(false);
+      expect(countries['DZ']!.official).toBe(false);
+    });
+
+    it('should reject an invalid structure at construction time', function () {
+      expect(() => new Specification('ZZ', 10, 'X06', 'ZZ00000000', false, false)).toThrow(/Invalid pattern/);
+      expect(() => new Specification('ZZ', 10, 'F0', 'ZZ00000000', false, false)).toThrow(/Invalid structure/);
+    });
+
+    it('should throw when the example does not match the length', function () {
+      expect(() => new Specification('ZZ', 10, 'F06', 'ZZ00', false, false)).toThrow(/example/);
+    });
+  });
+
+  describe('.countries immutability', function () {
+    it('should be frozen', function () {
+      expect(Object.isFrozen(countries)).toBe(true);
+      expect(() => {
+        (countries as Record<string, Specification>)['ZZ'] = countries['DE']!;
+      }).toThrow(TypeError);
+    });
+
+    it('should have a null prototype', function () {
+      expect(Object.getPrototypeOf(countries)).toBeNull();
     });
   });
 });
