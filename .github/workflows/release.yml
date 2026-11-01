@@ -1,0 +1,40 @@
+name: Release
+
+# Publishes to npm via trusted publishing (OIDC). No npm token is stored in the repository.
+# One-time setup on npmjs.com: package settings -> Trusted Publisher -> GitHub Actions,
+# organization/user "altrim", repository "iban.js", workflow filename "release.yml".
+# Provenance attestations are generated automatically for public packages.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - name: Verify tag matches package version
+        run: |
+          PKG="v$(node -p "require('./package.json').version")"
+          if [ "$PKG" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match package.json version $PKG"
+            exit 1
+          fi
+
+      - run: npm run check
+
+      - run: npm publish
