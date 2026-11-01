@@ -15,4 +15,4 @@ results
 npm-debug.log
 node_modules
 dist
-.superpowers/
+.playwright-mcp/
