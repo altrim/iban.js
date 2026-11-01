@@ -1,20 +1,13 @@
 <script setup lang="ts">
-import { Label, type LabelProps } from 'radix-vue'
-import { cn } from '@/lib/utils'
+import type { HTMLAttributes } from 'vue';
+import { Label, type LabelProps } from 'reka-ui';
+import { cn } from '@/lib/utils';
 
-const props = defineProps<LabelProps & { class?: string }>()
+const props = defineProps<LabelProps & { class?: HTMLAttributes['class'] }>();
 </script>
 
 <template>
-  <Label
-    v-bind="props"
-    :class="
-      cn(
-        'block text-sm tracking-tight font-medium text-foreground text-left',
-        props.class,
-      )
-    "
-  >
+  <Label :for="props.for" :class="cn('text-sm font-medium text-ink', props.class)">
     <slot />
   </Label>
 </template>
