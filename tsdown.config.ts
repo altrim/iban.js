@@ -5,7 +5,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   platform: 'neutral',
   target: 'es2020',
-  dts: { sourcemap: false },
+  dts: { sourcemap: true },
   sourcemap: true,
   minify: false,
   clean: true,
