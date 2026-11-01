@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { useDark, useToggle } from '@vueuse/core';
 import { Moon, Sun } from '@lucide/vue';
 import { countries } from 'iban-ts';
@@ -8,10 +9,21 @@ import BuildSection from '@/components/playground/BuildSection.vue';
 import FormatSection from '@/components/playground/FormatSection.vue';
 import RegistrySection from '@/components/playground/RegistrySection.vue';
 import ValidateSection from '@/components/playground/ValidateSection.vue';
+import GuidePage from '@/components/guide/GuidePage.vue';
+import { navigate, page, scrollToTarget } from '@/router';
 
 const isDark = useDark();
 const toggleDark = useToggle(isDark);
 const countryCount = Object.keys(countries).length;
+
+const sections = [
+  { id: 'validate', label: 'Validate' },
+  { id: 'build', label: 'Build from BBAN' },
+  { id: 'format', label: 'Format' },
+  { id: 'countries', label: 'Countries' },
+];
+
+onMounted(scrollToTarget);
 </script>
 
 <template>
@@ -26,12 +38,6 @@ const countryCount = Object.keys(countries).length;
           {{ countryCount }} countries and territories. Everything on this page runs in your browser with the published
           package.
         </p>
-        <nav class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-          <a href="#validate" class="text-accent hover:underline">Validate</a>
-          <a href="#build" class="text-accent hover:underline">Build from BBAN</a>
-          <a href="#format" class="text-accent hover:underline">Format</a>
-          <a href="#countries" class="text-accent hover:underline">Countries</a>
-        </nav>
       </div>
       <Button
         variant="outline"
@@ -44,14 +50,49 @@ const countryCount = Object.keys(countries).length;
       </Button>
     </header>
 
-    <main class="mt-12 flex flex-col gap-14">
-      <ValidateSection />
-      <hr class="border-line-strong" />
-      <BuildSection />
-      <hr class="border-line-strong" />
-      <FormatSection />
-      <hr class="border-line-strong" />
-      <RegistrySection />
+    <nav class="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-line text-sm" aria-label="Pages">
+      <a
+        href="#/"
+        :class="[
+          '-mb-px border-b-2 px-0.5 pb-2 font-medium',
+          page === 'playground' ? 'border-ink text-ink' : 'border-transparent text-ink-2 hover:text-ink',
+        ]"
+        :aria-current="page === 'playground' ? 'page' : undefined"
+        >Playground</a
+      >
+      <a
+        href="#/guide"
+        :class="[
+          '-mb-px border-b-2 px-0.5 pb-2 font-medium',
+          page === 'guide' ? 'border-ink text-ink' : 'border-transparent text-ink-2 hover:text-ink',
+        ]"
+        :aria-current="page === 'guide' ? 'page' : undefined"
+        >Usage guide</a
+      >
+      <template v-if="page === 'playground'">
+        <span class="hidden text-line-strong sm:inline" aria-hidden="true">|</span>
+        <a
+          v-for="s in sections"
+          :key="s.id"
+          :href="`#/#${s.id}`"
+          class="pb-2 text-ink-2 hover:text-ink"
+          @click.prevent="navigate('playground', s.id)"
+          >{{ s.label }}</a
+        >
+      </template>
+    </nav>
+
+    <main class="mt-10">
+      <div v-if="page === 'playground'" class="flex flex-col gap-14">
+        <ValidateSection />
+        <hr class="border-line-strong" />
+        <BuildSection />
+        <hr class="border-line-strong" />
+        <FormatSection />
+        <hr class="border-line-strong" />
+        <RegistrySection />
+      </div>
+      <GuidePage v-else />
     </main>
 
     <footer class="mt-16 flex flex-wrap gap-x-4 gap-y-1 border-t border-line pt-6 text-sm text-ink-2">
@@ -60,6 +101,13 @@ const countryCount = Object.keys(countries).length;
       >
       <a href="https://github.com/altrim/iban.js" target="_blank" rel="noopener" class="hover:text-ink"
         >Source on GitHub</a
+      >
+      <a
+        href="https://github.com/altrim/iban.js/blob/master/CHANGELOG.md"
+        target="_blank"
+        rel="noopener"
+        class="hover:text-ink"
+        >Changelog</a
       >
       <span class="ml-auto">MIT license</span>
     </footer>

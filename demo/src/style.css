@@ -97,3 +97,21 @@
     }
   }
 }
+
+/* Code sample tokens (see src/lib/highlight.ts) */
+.tok-comment {
+  color: var(--ink-2);
+  font-style: italic;
+}
+.tok-string {
+  color: var(--seg-a);
+}
+.tok-number {
+  color: var(--seg-check);
+}
+.tok-keyword {
+  color: var(--seg-country);
+}
+.tok-call {
+  color: var(--seg-b);
+}
