@@ -19,6 +19,9 @@
 
 ### Fixed
 
+- **Letters were accepted in the check-digit positions** (e.g. `BEI6539007547034` validated). Check digits must now be two digits.
+- Calling `Specification.fromBBAN` or `Specification.isValid` directly with lowercase letters produced wrong check digits; letters are now handled case-insensitively in the MOD 97 computation.
+
 - **`require('iban-ts')` crashed** with `ReferenceError: module is not defined in ES module scope` because the package declared `"type": "module"` while its CommonJS entry used a `.js` extension. CommonJS consumers now get a proper `.cjs` build; the exports map is validated by publint and arethetypeswrong.
 - `fromBBAN` and `isValidBBAN` now accept lowercase or padded country codes, matching `isValid`.
 - Country lookups can no longer resolve `Object.prototype` keys such as `constructor`.
@@ -28,7 +31,7 @@
 
 - Registry countries: DJ, FK, HN, LY, MN, NI, OM, RU, SD, SO, YE, plus territory codes AX, GG, IM, JE.
 - Unofficial countries: CF, CG, GA, GQ, GW, KM, MA, NE, TD, TG.
-- `Specification.official` (listed in the SWIFT IBAN Registry) and `Specification.sepa` (SEPA zone) metadata.
+- `Specification.official` (listed in the SWIFT IBAN Registry) and `Specification.sepa` (SEPA zone per the SWIFT registry and, for French territories, the EPC scheme scope EPC409-09) metadata.
 - `Specification` class is exported.
 - Registry parity test suite, CI workflow (Node 22 and 24), and a release workflow using npm trusted publishing with provenance.
 

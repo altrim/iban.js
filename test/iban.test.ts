@@ -55,10 +55,32 @@ describe('IBAN', function () {
 
     it('should return false for all examples when modifying just one digit', function () {
       Object.keys(countries).forEach(function (countryCode) {
-        let num = countries[countryCode]!.example;
-        num = num.slice(0, -1) + ((parseInt(num.slice(-1), 10) + 1) % 10);
-        expect(isValid(num)).toBe(false);
+        const example = countries[countryCode]!.example;
+        // Flip the last *digit* (some examples end in a letter) so the failure is the check, not the length.
+        const index = example.search(/[0-9](?=[^0-9]*$)/);
+        expect(index).toBeGreaterThan(3);
+        const flipped = String((Number(example[index]) + 1) % 10);
+        const corrupted = example.slice(0, index) + flipped + example.slice(index + 1);
+        expect(corrupted).toHaveLength(example.length);
+        expect(isValid(corrupted), countryCode).toBe(false);
       });
+    });
+
+    it('should reject letters in the check digit positions', function () {
+      expect(isValid('BEI6539007547034')).toBe(false);
+      expect(isValid('BEOX539007547034')).toBe(false);
+    });
+
+    it('should reject check digits outside the ISO 13616 range 02..98', function () {
+      // 00, 01 and 99 can never be produced by 98 - (n mod 97)
+      expect(isValid('BE00539007547034')).toBe(false);
+      expect(isValid('BE01539007547034')).toBe(false);
+      expect(isValid('BE99539007547034')).toBe(false);
+    });
+
+    it('should accept String objects', function () {
+      expect(isValid(new String('BE68 5390 0754 7034') as unknown as string)).toBe(true);
+      expect(printFormat(new String('BE68539007547034') as unknown as string)).toEqual('BE68 5390 0754 7034');
     });
 
     it('should return true for a valid Egypt IBAN', function () {
@@ -137,6 +159,10 @@ describe('IBAN', function () {
 
     it('should throw Error for unknown country code', function () {
       expect(() => toBBAN('ZZ68539007547034')).toThrow(/No country with code/);
+    });
+
+    it('should return undefined when the IBAN does not match the country structure', function () {
+      expect(toBBAN('BE68ABC007547034')).toBeUndefined();
     });
   });
 
@@ -297,6 +323,13 @@ describe('IBAN', function () {
     it('should reject an invalid structure at construction time', function () {
       expect(() => new Specification('ZZ', 10, 'X06', 'ZZ00000000', false, false)).toThrow(/Invalid pattern/);
       expect(() => new Specification('ZZ', 10, 'F0', 'ZZ00000000', false, false)).toThrow(/Invalid structure/);
+    });
+
+    it('should compute correct check digits for lowercase BBANs passed directly', function () {
+      const md = countries['MD']!;
+      expect(md.fromBBAN('ag000225100013104168')).toEqual('MD24ag000225100013104168');
+      expect(md.isValid('MD24ag000225100013104168')).toBe(true);
+      expect(md.isValid('md24ag000225100013104168')).toBe(false); // country code must be uppercase
     });
 
     it('should throw when the example does not match the length', function () {

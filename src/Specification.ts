@@ -17,6 +17,10 @@ const CHAR_0 = 48;
 const CHAR_9 = 57;
 const CHAR_A = 65;
 const CHAR_Z = 90;
+const CHAR_a = 97;
+const CHAR_z = 122;
+
+const isDigit = (code: number): boolean => code >= CHAR_0 && code <= CHAR_9;
 
 /**
  * Computes `iban mod 97` as specified in ISO 7064 (MOD 97-10) on the ISO 13616 rearranged form of
@@ -24,12 +28,11 @@ const CHAR_Z = 90;
  * the two digits 10..35.
  *
  * Runs in a single pass over the characters, keeping only a small integer remainder, so no
- * intermediate strings or regular expressions are needed. The input must already be in electronic
- * format (uppercase alphanumerics only); any other character makes the result 0, which never
- * validates. Callers also check the BBAN structure first.
+ * intermediate strings or regular expressions are needed. Letters may be upper or lower case.
  *
- * @param iban - An IBAN in electronic format.
+ * @param iban - An IBAN consisting of ASCII letters and digits only.
  * @returns The remainder in the range 0..96.
+ * @throws {TypeError} If the input contains a character that is not an ASCII letter or digit.
  */
 export const mod97 = (iban: string): number => {
   let remainder = 0;
@@ -37,14 +40,15 @@ export const mod97 = (iban: string): number => {
   // Process BBAN (from index 4) first, then the country code and check digits (indexes 0..3).
   for (let i = 0; i < length; i++) {
     const code = iban.charCodeAt(i < length - 4 ? i + 4 : i - (length - 4));
-    if (code >= CHAR_0 && code <= CHAR_9) {
+    if (isDigit(code)) {
       remainder = (remainder * 10 + (code - CHAR_0)) % 97;
     } else if (code >= CHAR_A && code <= CHAR_Z) {
       // Letters expand to two digits (A=10 .. Z=35).
       remainder = (remainder * 100 + (code - CHAR_A + 10)) % 97;
+    } else if (code >= CHAR_a && code <= CHAR_z) {
+      remainder = (remainder * 100 + (code - CHAR_a + 10)) % 97;
     } else {
-      // Not a valid IBAN character; force a non-1 remainder so validation fails.
-      return 0;
+      throw new TypeError(`Invalid character in IBAN at position ${i}`);
     }
   }
   return remainder;
@@ -93,6 +97,8 @@ export class Specification {
     return (
       this.length === iban.length &&
       this.countryCode === iban.slice(0, 2) &&
+      isDigit(iban.charCodeAt(2)) &&
+      isDigit(iban.charCodeAt(3)) &&
       this.regex.test(iban.slice(4)) &&
       mod97(iban) === 1
     );

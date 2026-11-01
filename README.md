@@ -92,7 +92,9 @@ Methods: `isValid(iban)`, `isValidBBAN(bban)`, `toBBAN(iban, separator)`, `fromB
 
 ## Supported countries
 
-All 89 countries in the SWIFT IBAN Registry are supported, including the 2021 to 2026 additions (Burundi, Djibouti, Falkland Islands, Honduras, Libya, Mongolia, Nicaragua, Oman, Russia, Somalia, Sudan, Yemen) and the territory codes AX, GG, IM, JE and the French overseas territories.
+All 89 countries in the SWIFT IBAN Registry are supported, including the 2021 to 2026 additions (Burundi, Djibouti, Falkland Islands, Honduras, Libya, Mongolia, Nicaragua, Oman, Russia, Somalia, Sudan, Yemen).
+
+Territory codes AX, GG, IM, JE and the French overseas territories (BL, GF, GP, MF, MQ, NC, PF, PM, RE, TF, WF, YT) are included for completeness with their parent's structure. Banks issue IBANs for these territories under the parent code (FI, GB, FR), so you will rarely meet an IBAN starting with one of them.
 
 Countries that use an IBAN-like format but are not in the registry (`official: false`): AO, BF, BJ, CF, CG, CI, CM, CV, DZ, GA, GQ, GW, IR, KM, MA, MG, ML, MZ, NE, SN, TD, TG. If you only want registry countries, check `countries[code].official`.
 
@@ -102,6 +104,8 @@ Countries that use an IBAN-like format but are not in the registry (`official: f
 npm install
 npm run check   # lint, format, typecheck, test, build, package validation, size
 ```
+
+The library runs on Node.js 20+, but the build toolchain (tsdown) needs Node.js 22.18 or newer.
 
 Releases are published from CI with npm trusted publishing and provenance when a `v*` tag is pushed.
 

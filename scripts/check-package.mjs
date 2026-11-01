@@ -1,14 +1,12 @@
-// Smoke-tests the built package exactly as consumers load it: CommonJS require() and ESM import.
+// Smoke-tests the built package exactly as consumers load it: CommonJS require() and ESM import,
+// resolved through the package's own exports map (package self-reference).
 // Run after `npm run build`. Exits non-zero on any mismatch.
 import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
 
-const cjs = require(path.join(root, 'dist/index.cjs'));
-const esm = await import(path.join(root, 'dist/index.js'));
+const cjs = require('iban-ts');
+const esm = await import('iban-ts');
 
 const expected = [
   'countries',
