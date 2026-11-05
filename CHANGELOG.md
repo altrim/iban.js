@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixes
+
+- **No runtime dependencies again.** 1.0.0 was published with `@lucide/vue` in `dependencies`, which pulled it and Vue into every install. It is only used by the demo, and is now declared there.
+
 ## 1.0.0 (2026-11-01)
 
 ### Breaking changes
