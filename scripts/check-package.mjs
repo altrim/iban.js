@@ -36,6 +36,13 @@ check(esm.isValid(iban) === true, 'ESM isValid returned false for a valid IBAN')
 check(cjs.printFormat(iban) === esm.printFormat(iban), 'CJS and ESM printFormat disagree');
 check(Object.keys(cjs.countries).length === Object.keys(esm.countries).length, 'CJS and ESM country counts differ');
 
+// The library ships with zero runtime dependencies: anything listed here is installed by every consumer.
+const { dependencies = {} } = require('iban-ts/package.json');
+check(
+  Object.keys(dependencies).length === 0,
+  `package.json declares runtime dependencies: ${Object.keys(dependencies).join(', ')}`,
+);
+
 if (failures > 0) {
   process.exit(1);
 }
