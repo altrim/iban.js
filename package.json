@@ -1,6 +1,6 @@
 {
   "name": "iban-ts",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Validate, format, and convert IBAN (International Bank Account Number) and BBAN (Basic Bank Account Number) for every country in the SWIFT IBAN Registry. Zero dependencies, TypeScript, ESM + CommonJS.",
   "license": "MIT",
   "author": "Altrim Beqiri",
