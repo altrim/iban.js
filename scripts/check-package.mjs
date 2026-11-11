@@ -40,7 +40,7 @@ check(Object.keys(cjs.countries).length === Object.keys(esm.countries).length, '
 const { dependencies = {} } = require('iban-ts/package.json');
 check(
   Object.keys(dependencies).length === 0,
-  `package.json declares runtime dependencies: ${Object.keys(dependencies).join(', ')}`,
+  `package.json declares runtime dependencies: ${Object.keys(dependencies).join(', ')}`
 );
 
 if (failures > 0) {
