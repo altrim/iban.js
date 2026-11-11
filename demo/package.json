@@ -10,11 +10,11 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@lucide/vue": "^1.66.0",
     "@vueuse/core": "^15.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "iban-ts": "file:..",
-    "lucide-vue-next": "^1.0.0",
     "reka-ui": "^2.11.0",
     "tailwind-merge": "^3.7.0",
     "vue": "^3.5.44"
